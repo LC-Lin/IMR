@@ -22,7 +22,7 @@ public interface Reply {
 
     long getTargetGroupNumber();
 
-    interface Sender{
+    interface Sender {
         void send(Reply reply);
     }
 

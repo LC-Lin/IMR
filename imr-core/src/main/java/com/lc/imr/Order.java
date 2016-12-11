@@ -13,6 +13,7 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
+
 package com.lc.imr;
 
 import android.support.annotation.NonNull;
@@ -56,13 +57,13 @@ public interface Order {
     /**
      * The interface Factory.
      */
-    interface Factory{
+    interface Factory {
         /**
-         * 如果可行就将一个对象包装成{@link Order}<br/>
+         * 如果可行就将�?个对象包装成{@link Order}<br/>
          * 如果不可行就返回null
          *
          * @param source 希望被包装的对象
-         * @return 一个Order对象或者null order
+         * @return �?个Order对象或�?�null order
          */
         @Nullable
         Order wrapSource(Object source);// TODO: 2016/12/10 check null and unsupported type

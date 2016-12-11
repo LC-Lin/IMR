@@ -48,12 +48,12 @@ final class MethodFinder {
                 targetMsg = method.getAnnotation(TargetMsg.class);
                 if (targetMsg == null) continue;
                 if (!checkMessage(targetMsg, message)) continue;
-                if (map.containsKey(object)){
+                if (map.containsKey(object)) {
                     map.get(object).add(method);
-                }else {
+                } else {
                     ArrayList<Method> list = new ArrayList<>();
                     list.add(method);
-                    map.put(object,list);
+                    map.put(object, list);
                 }
             }
         }

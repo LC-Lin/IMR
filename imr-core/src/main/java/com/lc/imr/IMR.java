@@ -47,7 +47,7 @@ public final class IMR {
                 .toString();
     }
 
-    public static ClientBuilder clientBuilder(){
+    public static ClientBuilder clientBuilder() {
         return new ClientBuilder();
     }
 
@@ -58,10 +58,11 @@ public final class IMR {
 
         private Reply.Sender sender;
 
-        public ClientBuilder registerObject(Object... object){
-            for (Object o:object){
+        public ClientBuilder registerObject(Object... object) {
+            for (Object o : object) {
                 if (o == null) throw new IllegalArgumentException("One of the objects is null");
-                if (objectArrayList.contains(o)) throw new IllegalArgumentException("One of the objects has been registered");
+                if (objectArrayList.contains(o))
+                    throw new IllegalArgumentException("One of the objects has been registered");
             }
             Collections.addAll(objectArrayList, object);
             return this;
@@ -79,8 +80,8 @@ public final class IMR {
             return this;
         }
 
-        public Client build(){
-            return new RealClient(objectArrayList,orderFactory,sender);
+        public Client build() {
+            return new RealClient(objectArrayList, orderFactory, sender);
         }
     }
 
