@@ -25,6 +25,7 @@ import com.lc.imr.annotation.LongParam;
 import com.lc.imr.annotation.Nick;
 import com.lc.imr.annotation.ReplySender;
 import com.lc.imr.annotation.Param;
+import com.lc.imr.annotation.ReplyType;
 import com.lc.imr.annotation.SendId;
 import com.lc.imr.annotation.Message;
 import com.lc.imr.annotation.RawOrder;
@@ -33,6 +34,12 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static com.lc.imr.IMR.DEFAULT;
+import static com.lc.imr.IMR.REPLY_TYPE_WORDS;
+import static com.lc.imr.IMR.REPLY_TYPE_XML;
 
 final class RealClient implements Client {
 
@@ -95,15 +102,15 @@ final class RealClient implements Client {
         }
 
         private void invoke() {
-            Object result;
+            Object result = null;
             try {
-                result = method.invoke(object,matchParams());
+                result = method.invoke(object, matchParams());
             } catch (IllegalAccessException e) {
                 Log.e(TAG, "invoke: The method to deal with the message should be public", e);
             } catch (InvocationTargetException e) {
                 Log.e(TAG, "invoke: The method to deal with the message throws an exception", e);
             }
-            dealWithResult(object);
+            dealWithResult(result);
         }
 
         private Object[] matchParams() {
@@ -145,8 +152,64 @@ final class RealClient implements Client {
             return params;
         }
 
-        private void dealWithResult(Object object){
+        private void dealWithResult(final Object result) {
             // TODO: 2016/12/10  wrap reply
+            if (result == null)
+                throw new IllegalArgumentException("the method must not return null\n" + method);
+            if (result instanceof Reply) {
+                sender.send((Reply) result);
+                return;
+            }
+            if (result instanceof String) {
+                final int replyTypeCode, serviceId;
+                ReplyType replyType = method.getAnnotation(ReplyType.class);
+                if (replyType == null) {
+                    replyTypeCode = DEFAULT;
+                    serviceId = 1;
+                } else {
+                    replyTypeCode = replyType.value();
+                    serviceId = replyType.serviceId();
+                }
+                Reply reply;
+                switch (replyTypeCode) {
+                    case REPLY_TYPE_WORDS: {
+                        reply = new Reply() {
+                            @Override
+                            public String getContent() {
+                                return (String) result;
+                            }
+
+                            @Override
+                            public long getTargetGroupNumber() {
+                                return order.getGroupNumber();
+                            }
+                        };
+                        break;
+                    }
+                    case REPLY_TYPE_XML: {
+                        reply = new XmlReply() {
+                            @Override
+                            public int getServiceId() {
+                                return serviceId;
+                            }
+
+                            @Override
+                            public String getContent() {
+                                return (String) result;
+                            }
+
+                            @Override
+                            public long getTargetGroupNumber() {
+                                return order.getGroupNumber();
+                            }
+                        };
+                        break;
+                    }
+                    default:
+                        throw new IllegalArgumentException("The value of ReplyType annotation should be the constant in the class IMR");
+                }
+                sender.send(reply);
+            }
         }
     }
 }

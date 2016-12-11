@@ -16,6 +16,7 @@
 package com.lc.imr;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * The interface Order.
@@ -63,6 +64,7 @@ public interface Order {
          * @param source 希望被包装的对象
          * @return 一个Order对象或者null order
          */
+        @Nullable
         Order wrapSource(Object source);// TODO: 2016/12/10 check null and unsupported type
     }
 
